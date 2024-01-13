@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>YouTube Downloader</title>
+</head>
+<body>
+    <h2>YouTube Video Downloader</h2>
+
+    {% if success %}
+        <p>Video "{{ title }}" downloaded successfully!</p>
+    {% endif %}
+
+    {% if error %}
+        <p>Error: {{ error_message }}</p>
+    {% endif %}
+
+    <form method="post" action="{% url 'index' %}">
+        {% csrf_token %}
+        <label for="video_url">Enter YouTube Video URL:</label>
+        <input type="text" name="video_url" required>
+        <button type="submit">Download</button>
+    </form>
+</body>
+</html>
