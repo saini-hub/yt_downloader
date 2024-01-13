@@ -1,24 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>YouTube Downloader</title>
-</head>
-<body>
-    <h2>YouTube Video Downloader</h2>
+from django.shortcuts import render
+from pytube import YouTube
 
-    {% if success %}
-        <p>Video "{{ title }}" downloaded successfully!</p>
-    {% endif %}
-
-    {% if error %}
-        <p>Error: {{ error_message }}</p>
-    {% endif %}
-
-    <form method="post" action="{% url 'index' %}">
-        {% csrf_token %}
-        <label for="video_url">Enter YouTube Video URL:</label>
-        <input type="text" name="video_url" required>
-        <button type="submit">Download</button>
-    </form>
-</body>
-</html>
+def index(request):
+    if request.method == 'POST':
+        video_url = request.POST['video_url']
+        try:
+            yt = YouTube(video_url)
+            video = yt.streams.filter(file_extension='mp4', progressive=True).first()
+            if video:
+                video.download('media/')
+                context = {'success': True, 'title': yt.title}
+            else:
+                context = {'error': True, 'error_message': 'No progressive stream available for the given video.'}
+        except Exception as e:
+            context = {'error': True, 'error_message': str(e)}
+    else:
+        context = {}
+    return render(request, 'downloader/index.html', context)
